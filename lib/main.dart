@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  Future.delayed(const Duration(seconds: 3)).then((_) => FlutterNativeSplash.remove());
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  widgetsBinding.deferFirstFrame();
+
+  Future.delayed(const Duration(seconds: 3)).then((_) {
+    widgetsBinding.allowFirstFrame();
+    // emulate javascript eventloop trick with setTimeout(0);
+    SchedulerBinding.instance.addPostFrameCallback((_) => FlutterNativeSplash.remove());
+  });
   runApp(const MyApp());
 }
 
